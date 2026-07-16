@@ -1,0 +1,88 @@
+.text-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--primary-black);
+}
+
+.editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: linear-gradient(90deg, rgba(0, 255, 65, 0.05) 0%, rgba(0, 217, 255, 0.05) 100%);
+  border-bottom: 1px solid var(--kali-green);
+  gap: 10px;
+}
+
+.editor-file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.file-name {
+  color: var(--kali-cyan);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.unsaved-indicator {
+  color: var(--accent);
+  font-size: 14px;
+  animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+.editor-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.editor-buttons button {
+  padding: 6px 12px;
+  border: 1px solid var(--kali-green);
+  background-color: var(--dark-gray);
+  color: var(--kali-green);
+  border-radius: 2px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editor-buttons button:hover {
+  background-color: var(--kali-green);
+  color: var(--primary-black);
+}
+
+.editor-textarea {
+  flex: 1;
+  border: none;
+  background-color: var(--primary-black);
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 15px;
+  resize: none;
+  overflow: auto;
+}
+
+.editor-textarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
+}
+
+.editor-status {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 15px;
+  border-top: 1px solid var(--kali-green);
+  background: linear-gradient(90deg, rgba(0, 255, 65, 0.05) 0%, rgba(0, 217, 255, 0.05) 100%);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
