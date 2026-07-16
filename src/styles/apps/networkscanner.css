@@ -1,0 +1,134 @@
+.network-scanner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 15px;
+  background-color: var(--primary-black);
+  overflow-y: auto;
+}
+
+.scanner-header {
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--kali-green);
+  padding-bottom: 10px;
+}
+
+.scanner-header h2 {
+  color: var(--kali-green);
+  font-size: 16px;
+  margin: 0;
+}
+
+.scanner-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: flex-end;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.control-group label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: bold;
+}
+
+.control-group input {
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.scan-btn {
+  padding: 8px 16px;
+  background-color: var(--dark-gray);
+  border: 1px solid var(--kali-green);
+  color: var(--kali-green);
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scan-btn:hover:not(:disabled) {
+  background-color: var(--kali-green);
+  color: var(--primary-black);
+}
+
+.scan-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.scan-progress {
+  text-align: center;
+  padding: 20px;
+  color: var(--kali-cyan);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.scanner-results {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.devices-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--dark-gray);
+  border: 1px solid var(--kali-green);
+  font-size: 11px;
+}
+
+.devices-table thead {
+  background: linear-gradient(90deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 217, 255, 0.05) 100%);
+  border-bottom: 1px solid var(--kali-green);
+}
+
+.devices-table th {
+  padding: 10px;
+  color: var(--kali-green);
+  font-weight: bold;
+  text-align: left;
+}
+
+.devices-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  color: var(--text-primary);
+}
+
+.device-row.online td:first-child {
+  color: #00ff41;
+}
+
+.device-row.offline td:first-child {
+  color: #ff4444;
+}
+
+.scanner-stats {
+  display: flex;
+  gap: 20px;
+  padding: 10px;
+  background: linear-gradient(90deg, rgba(0, 255, 65, 0.05) 0%, rgba(0, 217, 255, 0.05) 100%);
+  border: 1px solid var(--kali-green);
+  border-radius: 2px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.scanner-stats span {
+  color: var(--kali-green);
+}
