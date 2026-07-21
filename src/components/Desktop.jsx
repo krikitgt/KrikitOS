@@ -13,7 +13,7 @@ export default function Desktop({
     <div className="desktop">
       <div className="desktop-background">
         <div className="desktop-grid"></div>
-        <div className="desktop-logo">KrikitOS</div>
+        <div className="desktop-logo">Krikit-OS</div>
       </div>
       <div className="windows-container">
         {windows.map((win) => (
