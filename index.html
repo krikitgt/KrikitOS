@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krikit OS - Cyber-Neon Operating System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+    
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        :root {
+            --primary: #00ff88;
+            --secondary: #ff00ff;
+            --tertiary: #00ffff;
+            --bg: #0a0e27;
+            --surface: #1a1f3a;
+            --accent: #ff006e;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Animated wallpaper background */
+        .wallpaper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #0a0e27, #1a1f3a, #0f3460);
+            animation: gradientShift 8s ease infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Grid pattern overlay */
+        .grid-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 255, 136, 0.05) 25%, rgba(0, 255, 136, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 136, 0.05) 75%, rgba(0, 255, 136, 0.05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 255, 136, 0.05) 25%, rgba(0, 255, 136, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 136, 0.05) 75%, rgba(0, 255, 136, 0.05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        /* Neon glow effects */
+        .neon-glow {
+            text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--secondary);
+            box-shadow: 0 0 10px var(--primary), inset 0 0 10px rgba(0, 255, 136, 0.1);
+        }
+
+        .neon-border {
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 10px var(--primary), inset 0 0 5px rgba(0, 255, 136, 0.2);
+        }
+
+        .neon-border-secondary {
+            border: 2px solid var(--secondary);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        .neon-border-cyan {
+            border: 2px solid var(--tertiary);
+            box-shadow: 0 0 10px var(--tertiary);
+        }
+
+        /* Window styles */
+        .window {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.95) 0%, rgba(15, 52, 96, 0.95) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 10px rgba(0, 255, 136, 0.1);
+            display: flex;
+            flex-direction: column;
+            min-width: 300px;
+            min-height: 200px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .window.active {
+            z-index: 200;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.5), inset 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .window-header {
+            background: linear-gradient(90deg, rgba(0, 255, 136, 0.1) 0%, rgba(255, 0, 111, 0.1) 100%);
+            border-bottom: 2px solid var(--primary);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .window-header h3 {
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 0 0 10px var(--primary);
+            margin: 0;
+            flex: 1;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .window-btn {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--primary);
+            background: rgba(0, 255, 136, 0.1);
+            cursor: pointer;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 10px;
+        }
+
+        .window-btn:hover {
+            background: var(--primary);
+            color: #0a0e27;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .window-content {
+            flex: 1;
+            overflow: auto;
+            padding: 15px;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(26, 31, 58, 0.98) 0%, rgba(15, 52, 96, 0.98) 100%);
+            border-top: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 10px;
+            z-index: 50;
+            box-shadow: 0 -10px 30px rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .taskbar-item {
+            height: 40px;
+            padding: 5px 15px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            transition: all 0.3s;
+            color: var(--primary);
+            text-shadow: 0 0 5px var(--primary);
+        }
+
+        .taskbar-item:hover {
+            background: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 15px var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .taskbar-item.active {
+            background: var(--primary);
+            color: #0a0e27;
+            text-shadow: none;
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        /* Desktop icons */
+        .desktop-icons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 10;
+        }
+
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            gap: 8px;
+        }
+
+        .desktop-icon-image {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(255, 0, 111, 0.2));
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .desktop-icon:hover .desktop-icon-image {
+            box-shadow: 0 0 20px var(--primary), 0 0 30px var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .desktop-icon-label {
+            font-size: 11px;
+            text-align: center;
+            max-width: 70px;
+            color: var(--primary);
+            text-shadow: 0 0 5px var(--primary);
+        }
+
+        /* Start menu */
+        .start-menu {
+            position: fixed;
+            bottom: 65px;
+            left: 15px;
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.98) 0%, rgba(15, 52, 96, 0.98) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            padding: 10px 0;
+            min-width: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+            z-index: 150;
+            backdrop-filter: blur(10px);
+        }
+
+        .start-menu-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            transition: all 0.2s;
+            color: var(--primary);
+        }
+
+        .start-menu-item:hover {
+            background: rgba(0, 255, 136, 0.2);
+            box-shadow: inset 0 0 10px rgba(0, 255, 136, 0.1);
+            padding-left: 20px;
+        }
+
+        .start-menu-divider {
+            height: 1px;
+            background: rgba(0, 255, 136, 0.2);
+            margin: 5px 0;
+        }
+
+        /* Input styles */
+        input, textarea, select {
+            background: rgba(10, 14, 39, 0.8);
+            color: var(--primary);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+            background: rgba(10, 14, 39, 0.9);
+        }
+
+        /* Button styles */
+        button {
+            background: linear-gradient(90deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px var(--primary);
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, rgba(0, 255, 136, 0.4), rgba(0, 255, 136, 0.3));
+            box-shadow: 0 0 15px var(--primary);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 136, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 136, 0.5);
+        }
+
+        /* Animation classes */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Terminal styles */
+        .terminal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 4px;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .terminal-line {
+            margin: 2px 0;
+        }
+
+        .terminal-input {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .terminal-prompt {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .terminal-input-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            outline: none;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Chat styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .message.user {
+            background: rgba(0, 255, 136, 0.15);
+            border-left: 3px solid var(--primary);
+            margin-left: 20px;
+        }
+
+        .message.ai {
+            background: rgba(255, 0, 111, 0.15);
+            border-left: 3px solid var(--secondary);
+            margin-right: 20px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 12px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--secondary);
+            animation: typingBounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-field {
+            flex: 1;
+        }
+
+        /* Game canvas styles */
+        canvas {
+            display: block;
+            background: #0a0e27;
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+
+        /* File manager styles */
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .file-item:hover {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--primary);
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .file-name {
+            font-size: 11px;
+            text-align: center;
+            word-break: break-all;
+            max-width: 70px;
+        }
+
+        /* Music player styles */
+        .music-player {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .music-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .music-visualizer {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+            justify-content: center;
+            height: 80px;
+        }
+
+        .visualizer-bar {
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Settings styles */
+        .settings-group {
+            margin-bottom: 20px;
+        }
+
+        .settings-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .settings-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Notepad styles */
+        .notepad-editor {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 10px;
+        }
+
+        .notepad-toolbar {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notepad-textarea {
+            flex: 1;
+            resize: none;
+        }
+
+        /* Grid background for games */
+        .game-grid {
+            background: linear-gradient(0deg, transparent 24%, rgba(0, 255, 136, 0.05) 25%, rgba(0, 255, 136, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 136, 0.05) 75%, rgba(0, 255, 136, 0.05) 76%, transparent 77%, transparent),
+                        linear-gradient(90deg, transparent 24%, rgba(0, 255, 136, 0.05) 25%, rgba(0, 255, 136, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 136, 0.05) 75%, rgba(0, 255, 136, 0.05) 76%, transparent 77%, transparent);
+            background-size: 30px 30px;
+        }
+
+        /* Minimize animation */
+        @keyframes minimizeWindow {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.1);
+            }
+        }
+
+        @keyframes maximizeWindow {
+            0% {
+                opacity: 0;
+                transform: scale(0.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .window.minimizing {
+            animation: minimizeWindow 0.3s ease-in forwards;
+        }
+
+        .window.maximizing {
+            animation: maximizeWindow 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Wallpaper -->
+        <div class="wallpaper">
+            <div class="grid-pattern"></div>
+        </div>
+
+        <!-- Desktop Icons -->
+        <div class="desktop-icons">
+            <div class="desktop-icon" @click="launchApp('krikit-ai')" title="Krikit AI">
+                <div class="desktop-icon-image">🤖</div>
+                <div class="desktop-icon-label">Krikit AI</div>
+            </div>
+            <div class="desktop-icon" @click="launchApp('kosh-shell')" title="Kosh Shell">
+                <div class="desktop-icon-image">💾</div>
+                <div class="desktop-icon-label">Kosh Shell</div>
+            </div>
+            <div class="desktop-icon" @click="launchApp('notepad')" title="Notepad">
+                <div class="desktop-icon-image">📝</div>
+                <div class="desktop-icon-label">Notepad</div>
+            </div>
+            <div class="desktop-icon" @click="launchApp('files')" title="Files">
+                <div class="desktop-icon-image">📁</div>
+                <div class="desktop-icon-label">Files</div>
+            </div>
+            <div class="desktop-icon" @click="launchApp('music')" title="Music Player">
+                <div class="desktop-icon-image">🎵</div>
+                <div class="desktop-icon-label">Music</div>
+            </div>
+            <div class="desktop-icon" @click="launchApp('settings')" title="Settings">
+                <div class="desktop-icon-image">⚙️</div>
+                <div class="desktop-icon-label">Settings</div>
+            </div>
+            <div class="desktop-icon" @click="launchApp('snake')" title="Snake Game">
+                <div class="desktop-icon-image">🐍</div>
+                <div class="desktop-icon-label">Snake</div>
+            </div>
+            <div class="desktop-icon" @click="launchApp('tictactoe')" title="Tic Tac Toe">
+                <div class="desktop-icon-image">⭕</div>
+                <div class="desktop-icon-label">Tic Tac Toe</div>
+            </div>
+            <div class="desktop-icon" @click="launchApp('2048')" title="2048">
+                <div class="desktop-icon-image">🎮</div>
+                <div class="desktop-icon-label">2048</div>
+            </div>
+        </div>
+
+        <!-- Windows -->
+        <template v-for="(app, id) in windows" :key="id">
+            <!-- Krikit AI -->
+            <div v-if="app.type === 'krikit-ai'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>🤖 Krikit AI</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="chat-container">
+                        <div class="chat-messages" ref="chatMessages">
+                            <template v-for="(msg, idx) in app.chatHistory" :key="idx">
+                                <div :class="['message', msg.role]">
+                                    <strong>{{ msg.role === 'user' ? 'You' : 'Krikit AI' }}:</strong><br>
+                                    {{ msg.content }}
+                                </div>
+                            </template>
+                            <div v-if="app.isTyping" class="typing-indicator">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <input v-model="app.apiKey" placeholder="OpenAI API Key (optional)" style="width: 100%; margin-bottom: 8px;" />
+                            <div class="chat-input">
+                                <input v-model="app.currentMessage" placeholder="Type a message..." class="chat-input-field" 
+                                       @keyup.enter="sendChatMessage(id)" />
+                                <button @click="sendChatMessage(id)">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kosh Shell -->
+            <div v-if="app.type === 'kosh-shell'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>💾 Kosh Shell</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="terminal">
+                        <div class="terminal-output">
+                            <template v-for="(line, idx) in app.output" :key="idx">
+                                <div class="terminal-line" v-html="line"></div>
+                            </template>
+                        </div>
+                        <div class="terminal-input">
+                            <span class="terminal-prompt">krikit@os ~$</span>
+                            <input v-model="app.currentCommand" placeholder="" class="terminal-input-field" 
+                                   @keyup.enter="executeCommand(id)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notepad -->
+            <div v-if="app.type === 'notepad'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>📝 Notepad</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="notepad-editor">
+                        <div class="notepad-toolbar">
+                            <button @click="saveNote(id)">Save</button>
+                            <button @click="loadNote(id)">Load</button>
+                            <button @click="clearNote(id)">Clear</button>
+                            <input v-model="app.filename" placeholder="Filename" style="flex: 1; margin-left: 10px;" />
+                        </div>
+                        <textarea v-model="app.content" class="notepad-textarea" placeholder="Start typing..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Manager -->
+            <div v-if="app.type === 'files'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>📁 Files</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+                        <input v-model="app.newFileName" placeholder="New file name" />
+                        <button @click="createFile(id)">Create</button>
+                    </div>
+                    <div class="file-list">
+                        <div v-for="file in app.files" :key="file.name" class="file-item" @click="selectFile(id, file.name)">
+                            <div class="file-icon">
+                                {{ file.type === 'text' ? '📄' : '🖼️' }}
+                            </div>
+                            <div class="file-name">{{ file.name }}</div>
+                            <button @click.stop="deleteFile(id, file.name)" style="font-size: 10px; padding: 3px 6px;">Delete</button>
+                        </div>
+                    </div>
+                    <div v-if="app.selectedFile" style="margin-top: 15px; border-top: 1px solid var(--primary); padding-top: 15px;">
+                        <h4 style="margin-bottom: 10px;">{{ app.selectedFile }}</h4>
+                        <textarea v-model="app.fileContent" style="width: 100%; height: 150px; resize: none;"></textarea>
+                        <button @click="updateFile(id)" style="margin-top: 10px;">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Music Player -->
+            <div v-if="app.type === 'music'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>🎵 Music Player</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="music-player">
+                        <div style="text-align: center;">
+                            <h3 style="margin-bottom: 5px;">{{ app.tracks[app.currentTrack].name }}</h3>
+                            <p style="font-size: 12px; color: var(--secondary);">8-bit Chiptune</p>
+                        </div>
+                        <div class="music-visualizer" ref="visualizer">
+                            <div v-for="i in 20" :key="i" class="visualizer-bar" :style="{ height: (Math.random() * 60) + 'px' }"></div>
+                        </div>
+                        <div class="music-controls">
+                            <button @click="previousTrack(id)">⏮️ Prev</button>
+                            <button @click="toggleMusic(id)">{{ app.isPlaying ? '⏸️ Pause' : '▶️ Play' }}</button>
+                            <button @click="nextTrack(id)">Next ⏭️</button>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <span style="flex: 1;">Volume</span>
+                            <input v-model="app.volume" type="range" min="0" max="100" @change="updateVolume(id)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div v-if="app.type === 'settings'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>⚙️ Settings</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div class="settings-group">
+                        <label>Accent Color</label>
+                        <div class="color-picker">
+                            <div v-for="color in colors" :key="color.name" class="color-option" 
+                                 :style="{ backgroundColor: color.value }" 
+                                 :class="{ selected: app.accentColor === color.name }"
+                                 @click="setAccentColor(color.name)"
+                                 :title="color.name"></div>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <label>Sound Volume</label>
+                        <input v-model="app.soundVolume" type="range" min="0" max="100" @change="updateSoundVolume" />
+                        <div style="font-size: 12px; margin-top: 5px;">{{ app.soundVolume }}%</div>
+                    </div>
+                    <div class="settings-group">
+                        <label>System Info</label>
+                        <div style="font-size: 12px; background: rgba(0, 255, 136, 0.05); padding: 10px; border-radius: 4px;">
+                            <div>Krikit OS v1.0</div>
+                            <div>Memory: {{ (Math.random() * 512).toFixed(2) }} MB</div>
+                            <div>Uptime: {{ getUptime() }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Snake Game -->
+            <div v-if="app.type === 'snake'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>🐍 Snake</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; height: 100%;">
+                        <div style="font-size: 14px;">Score: {{ app.snakeScore }}</div>
+                        <canvas :id="'snake-' + id" width="300" height="300" class="game-grid"></canvas>
+                        <div style="display: flex; gap: 10px;">
+                            <button @click="initSnakeGame(id)">New Game</button>
+                            <button @click="toggleSnakePause(id)">{{ app.snakePaused ? 'Resume' : 'Pause' }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tic Tac Toe -->
+            <div v-if="app.type === 'tictactoe'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>⭕ Tic Tac Toe</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; height: 100%;">
+                        <div style="font-size: 14px;">
+                            {{ app.tictactoeWinner ? `Winner: ${app.tictactoeWinner}` : `Current: ${app.tictactoeCurrentPlayer}` }}
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px;">
+                            <button v-for="(cell, idx) in app.tictactoeBoard" :key="idx" 
+                                    @click="playTicTacToe(id, idx)"
+                                    style="width: 80px; height: 80px; font-size: 24px; background: rgba(0, 255, 136, 0.05); border: 2px solid var(--primary); cursor: pointer;"
+                                    :disabled="cell !== '' || app.tictactoeWinner">
+                                {{ cell }}
+                            </button>
+                        </div>
+                        <button @click="resetTicTacToe(id)">New Game</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2048 Game -->
+            <div v-if="app.type === '2048'" :class="['window animate-slideIn', { active: activeWindow === id }]" 
+                 :style="{ left: app.x + 'px', top: app.y + 'px', width: app.width + 'px', height: app.height + 'px' }"
+                 @mousedown="setActiveWindow(id)">
+                <div class="window-header" @mousedown.stop="startDrag(id, $event)">
+                    <h3>🎮 2048</h3>
+                    <div class="window-controls">
+                        <button class="window-btn" @click="minimizeWindow(id)" title="Minimize">−</button>
+                        <button class="window-btn" @click="maximizeWindow(id)" title="Maximize">□</button>
+                        <button class="window-btn" @click="closeWindow(id)" title="Close">✕</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; height: 100%;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
+                            <div><strong>Score: {{ app.game2048Score }}</strong></div>
+                            <button @click="init2048Game(id)">New Game</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 70px); gap: 8px; padding: 8px; background: rgba(0, 255, 136, 0.05); border-radius: 4px;">
+                            <div v-for="(row, ri) in app.game2048Board" :key="ri" style="display: contents;">
+                                <div v-for="(cell, ci) in row" :key="ci" 
+                                     :style="{ 
+                                         width: '70px', 
+                                         height: '70px', 
+                                         display: 'flex', 
+                                         alignItems: 'center', 
+                                         justifyContent: 'center', 
+                                         backgroundColor: getTile2048Color(cell),
+                                         border: '2px solid var(--primary)',
+                                         borderRadius: '4px',
+                                         fontSize: cell > 0 ? '18px' : '12px',
+                                         fontWeight: 'bold',
+                                         color: cell > 0 ? '#0a0e27' : 'var(--primary)'
+                                     }}"
+                                     class="neon-glow">
+                                    {{ cell > 0 ? cell : '' }}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; text-align: center; color: var(--secondary);">
+                            Use arrow keys to move tiles
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Start Menu Button -->
+        <div class="taskbar">
+            <button @click="toggleStartMenu" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
+                🚀 START
+            </button>
+            
+            <!-- Taskbar items -->
+            <template v-for="(app, id) in windows" :key="id">
+                <div v-if="!app.minimized" class="taskbar-item" 
+                     :class="{ active: activeWindow === id }"
+                     @click="toggleWindow(id)">
+                    {{ app.type.toUpperCase() }}
+                </div>
+            </template>
+
+            <!-- System Clock -->
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
+                <div class="taskbar-item" style="background: transparent; border: none; text-shadow: 0 0 10px var(--primary); cursor: default;">
+                    {{ currentTime }}
+                </div>
+                <div class="taskbar-item" style="background: transparent; border: none; text-shadow: 0 0 10px var(--primary); cursor: default;">
+                    📡
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Menu -->
+        <div v-if="showStartMenu" class="start-menu">
+            <div class="start-menu-item" style="font-weight: bold; padding: 15px;">
+                🚀 KRIKIT OS
+            </div>
+            <div class="start-menu-divider"></div>
+            <div class="start-menu-item" @click="launchApp('krikit-ai')">🤖 Krikit AI</div>
+            <div class="start-menu-item" @click="launchApp('kosh-shell')">💾 Kosh Shell</div>
+            <div class="start-menu-item" @click="launchApp('notepad')">📝 Notepad</div>
+            <div class="start-menu-item" @click="launchApp('files')">📁 Files</div>
+            <div class="start-menu-item" @click="launchApp('music')">🎵 Music Player</div>
+            <div class="start-menu-item" @click="launchApp('settings')">⚙️ Settings</div>
+            <div class="start-menu-divider"></div>
+            <div class="start-menu-item" @click="launchApp('snake')">🐍 Snake Game</div>
+            <div class="start-menu-item" @click="launchApp('tictactoe')">⭕ Tic Tac Toe</div>
+            <div class="start-menu-item" @click="launchApp('2048')">🎮 2048</div>
+            <div class="start-menu-divider"></div>
+            <div class="start-menu-item" @click="showAbout = true">ℹ️ About</div>
+            <div class="start-menu-item" @click="shutdown">🔌 Shutdown</div>
+        </div>
+
+        <!-- About Dialog -->
+        <div v-if="showAbout" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26, 31, 58, 0.98); border: 2px solid var(--primary); padding: 30px; border-radius: 8px; max-width: 400px; box-shadow: 0 0 30px rgba(0, 255, 136, 0.3); z-index: 300;">
+            <h2 style="margin-bottom: 15px; text-shadow: 0 0 10px var(--primary);">🚀 Krikit OS</h2>
+            <p>Version 1.0 - A futuristic cyber-neon operating system</p>
+            <p style="margin-top: 10px;">Built with Vue 3, Tailwind CSS, and Web Audio API</p>
+            <p style="margin-top: 10px; font-size: 12px; color: var(--secondary);">All apps run concurrently in independent windows</p>
+            <button @click="showAbout = false" style="margin-top: 20px; width: 100%;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        // Audio Context for sound effects
+        let audioContext = null;
+        let soundVolume = 50;
+
+        const app = createApp({
+            data() {
+                return {
+                    windows: {},
+                    activeWindow: null,
+                    showStartMenu: false,
+                    showAbout: false,
+                    currentTime: '00:00',
+                    windowCounter: 0,
+                    draggedWindow: null,
+                    dragOffset: { x: 0, y: 0 },
+                    colors: [
+                        { name: 'Green', value: '#00ff88' },
+                        { name: 'Magenta', value: '#ff00ff' },
+                        { name: 'Cyan', value: '#00ffff' },
+                        { name: 'Pink', value: '#ff006e' },
+                        { name: 'Orange', value: '#ff9500' },
+                        { name: 'Purple', value: '#9d4edd' },
+                    ],
+                    startTime: Date.now(),
+                };
+            },
+            mounted() {
+                this.initAudio();
+                this.updateClock();
+                setInterval(() => this.updateClock(), 1000);
+                document.addEventListener('keydown', this.handleKeyDown.bind(this));
+                document.addEventListener('keyup', this.handleKeyUp.bind(this));
+                document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+                document.addEventListener('click', this.handleClick.bind(this));
+            },
+            methods: {
+                initAudio() {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    soundVolume = parseInt(localStorage.getItem('soundVolume') || '50');
+                },
+                playSound(frequency = 800, duration = 0.1, type = 'sine') {
+                    if (!audioContext || soundVolume === 0) return;
+                    try {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        oscillator.frequency.value = frequency;
+                        oscillator.type = type;
+                        gainNode.gain.setValueAtTime(soundVolume / 200, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + duration);
+                    } catch (e) {}
+                },
+                launchApp(type) {
+                    this.playSound(1200, 0.1);
+                    const id = `window-${this.windowCounter++}`;
+                    const baseConfig = {
+                        type,
+                        x: Math.random() * 400 + 100,
+                        y: Math.random() * 300 + 50,
+                        width: 500,
+                        height: 400,
+                        minimized: false,
+                        maximized: false,
+                    };
+
+                    switch(type) {
+                        case 'krikit-ai':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                chatHistory: [{ role: 'ai', content: 'Hello! I\'m Krikit AI. How can I assist you?' }],
+                                currentMessage: '',
+                                isTyping: false,
+                                apiKey: localStorage.getItem('openaiKey') || '',
+                            };
+                            break;
+                        case 'kosh-shell':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                output: ['<span style="color: var(--secondary);">Kosh Shell v1.0</span>', 'Type "help" for commands', ''],
+                                currentCommand: '',
+                            };
+                            break;
+                        case 'notepad':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                content: localStorage.getItem('notepadContent') || '',
+                                filename: 'untitled.txt',
+                            };
+                            break;
+                        case 'files':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                files: this.getVirtualFiles(),
+                                newFileName: '',
+                                selectedFile: null,
+                                fileContent: '',
+                            };
+                            break;
+                        case 'music':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                width: 350,
+                                height: 320,
+                                isPlaying: false,
+                                currentTrack: 0,
+                                volume: 50,
+                                tracks: [
+                                    { name: 'Chiptune Dream', freq: 440 },
+                                    { name: 'Retro Wave', freq: 523 },
+                                    { name: 'Pixel Paradise', freq: 587 },
+                                    { name: 'Digital Void', freq: 659 },
+                                ],
+                            };
+                            break;
+                        case 'settings':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                width: 380,
+                                height: 450,
+                                accentColor: localStorage.getItem('accentColor') || 'Green',
+                                soundVolume: soundVolume,
+                            };
+                            break;
+                        case 'snake':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                width: 350,
+                                height: 420,
+                                snakeBody: [[10, 10]],
+                                snakeDirection: [1, 0],
+                                snakeNextDirection: [1, 0],
+                                food: [15, 15],
+                                snakeScore: 0,
+                                snakePaused: false,
+                                snakeGameRunning: true,
+                            };
+                            this.$nextTick(() => this.initSnakeGame(id));
+                            break;
+                        case 'tictactoe':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                width: 380,
+                                height: 350,
+                                tictactoeBoard: ['', '', '', '', '', '', '', '', ''],
+                                tictactoeCurrentPlayer: 'X',
+                                tictactoeWinner: null,
+                            };
+                            break;
+                        case '2048':
+                            this.windows[id] = {
+                                ...baseConfig,
+                                width: 380,
+                                height: 420,
+                                game2048Board: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+                                game2048Score: 0,
+                                game2048Moves: [],
+                            };
+                            this.$nextTick(() => this.init2048Game(id));
+                            break;
+                    }
+                    this.setActiveWindow(id);
+                    return id;
+                },
+                closeWindow(id) {
+                    this.playSound(600, 0.08);
+                    delete this.windows[id];
+                    if (this.activeWindow === id) {
+                        this.activeWindow = null;
+                    }
+                },
+                minimizeWindow(id) {
+                    this.playSound(800, 0.08);
+                    this.windows[id].minimized = true;
+                },
+                maximizeWindow(id) {
+                    const win = this.windows[id];
+                    if (win.maximized) {
+                        win.maximized = false;
+                        win.x = Math.random() * 400 + 100;
+                        win.y = Math.random() * 300 + 50;
+                    } else {
+                        win.maximized = true;
+                        win.x = 0;
+                        win.y = 0;
+                        win.width = window.innerWidth;
+                        win.height = window.innerHeight - 60;
+                    }
+                    this.playSound(1000, 0.08);
+                },
+                toggleWindow(id) {
+                    if (this.windows[id].minimized) {
+                        this.windows[id].minimized = false;
+                        this.playSound(1200, 0.1);
+                    } else {
+                        this.minimizeWindow(id);
+                    }
+                },
+                setActiveWindow(id) {
+                    this.activeWindow = id;
+                    this.showStartMenu = false;
+                },
+                startDrag(id, event) {
+                    this.draggedWindow = id;
+                    const rect = event.target.closest('.window').getBoundingClientRect();
+                    this.dragOffset = {
+                        x: event.clientX - rect.left,
+                        y: event.clientY - rect.top,
+                    };
+                },
+                handleMouseMove(event) {
+                    if (this.draggedWindow && this.windows[this.draggedWindow]) {
+                        const win = this.windows[this.draggedWindow];
+                        if (!win.maximized) {
+                            win.x = event.clientX - this.dragOffset.x;
+                            win.y = event.clientY - this.dragOffset.y;
+                        }
+                    }
+                },
+                handleMouseUp() {
+                    this.draggedWindow = null;
+                },
+                toggleStartMenu() {
+                    this.playSound(900, 0.08);
+                    this.showStartMenu = !this.showStartMenu;
+                },
+                handleClick(event) {
+                    if (!event.target.closest('.start-menu') && !event.target.closest('.taskbar button:first-child')) {
+                        this.showStartMenu = false;
+                    }
+                },
+                updateClock() {
+                    const now = new Date();
+                    this.currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                },
+                getUptime() {
+                    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                    const hours = Math.floor(elapsed / 3600);
+                    const minutes = Math.floor((elapsed % 3600) / 60);
+                    return `${hours}h ${minutes}m`;
+                },
+
+                // Chat functionality
+                sendChatMessage(id) {
+                    const win = this.windows[id];
+                    if (!win.currentMessage.trim()) return;
+
+                    win.chatHistory.push({ role: 'user', content: win.currentMessage });
+                    const userMessage = win.currentMessage;
+                    win.currentMessage = '';
+                    win.isTyping = true;
+
+                    this.playSound(1000, 0.1);
+
+                    setTimeout(() => {
+                        const response = this.generateAIResponse(userMessage);
+                        win.chatHistory.push({ role: 'ai', content: response });
+                        win.isTyping = false;
+                        this.$nextTick(() => {
+                            const chatMessages = this.$refs.chatMessages;
+                            if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+                        });
+                    }, 800 + Math.random() * 1200);
+                },
+                generateAIResponse(message) {
+                    const responses = {
+                        hello: "Hello! How can I help you today?",
+                        help: "I'm Krikit AI, your digital assistant. Ask me anything!",
+                        time: `The current time is ${this.currentTime}`,
+                        joke: "Why did the AI go to school? Because it wanted to improve its neural network! 😄",
+                        weather: "The weather in the digital realm is always perfect!",
+                        default: "That's interesting! Tell me more about it.",
+                    };
+
+                    const msg = message.toLowerCase();
+                    for (const [key, value] of Object.entries(responses)) {
+                        if (msg.includes(key)) return value;
+                    }
+                    return responses.default;
+                },
+
+                // Terminal functionality
+                executeCommand(id) {
+                    const win = this.windows[id];
+                    const cmd = win.currentCommand.trim();
+                    if (!cmd) return;
+
+                    win.output.push(`<span style="color: var(--secondary);">krikit@os ~$</span> ${cmd}`);
+
+                    this.playSound(800, 0.05);
+
+                    let output = '';
+                    const parts = cmd.split(' ');
+                    const command = parts[0].toLowerCase();
+                    const args = parts.slice(1).join(' ');
+
+                    switch(command) {
+                        case 'help':
+                            output = `Available commands:
+  help          - Show this help
+  clear         - Clear terminal
+  echo [text]   - Echo text
+  date          - Show current date/time
+  ls            - List files
+  cat [file]    - Show file content
+  calc [expr]   - Calculate expression
+  theme [color] - Change theme
+  weather       - Show weather
+  ai [query]    - Ask AI`;
+                            break;
+                        case 'clear':
+                            win.output = [];
+                            win.currentCommand = '';
+                            return;
+                        case 'echo':
+                            output = args;
+                            break;
+                        case 'date':
+                            output = new Date().toString();
+                            break;
+                        case 'ls':
+                            output = 'Desktop/  Documents/  Downloads/  Music/  Pictures/  Videos/';
+                            break;
+                        case 'cat':
+                            output = `File: ${args}\nContent: Lorem ipsum dolor sit amet...`;
+                            break;
+                        case 'calc':
+                            try {
+                                output = `Result: ${eval(args)}`;
+                            } catch (e) {
+                                output = `Error: Invalid expression`;
+                            }
+                            break;
+                        case 'weather':
+                            output = '🌤️  Sunny, 72°F (Digital Realm)';
+                            break;
+                        case 'theme':
+                            output = `Theme changed to ${args}`;
+                            this.setAccentColor(args);
+                            break;
+                        case 'ai':
+                            output = this.generateAIResponse(args);
+                            break;
+                        default:
+                            output = `Command not found: ${command}`;
+                    }
+
+                    if (output) {
+                        win.output.push(output);
+                    }
+                    win.output.push('');
+                    win.currentCommand = '';
+                },
+
+                // Notepad functionality
+                saveNote(id) {
+                    this.playSound(1200, 0.1);
+                    const win = this.windows[id];
+                    localStorage.setItem('notepadContent', win.content);
+                    localStorage.setItem('notepadFilename', win.filename);
+                    alert(`Saved as ${win.filename}`);
+                },
+                loadNote(id) {
+                    this.playSound(1000, 0.1);
+                    const win = this.windows[id];
+                    const content = localStorage.getItem('notepadContent') || '';
+                    win.content = content;
+                },
+                clearNote(id) {
+                    this.playSound(600, 0.08);
+                    this.windows[id].content = '';
+                },
+
+                // File manager
+                getVirtualFiles() {
+                    return JSON.parse(localStorage.getItem('virtualFiles') || '[]') || [];
+                },
+                saveVirtualFiles(files) {
+                    localStorage.setItem('virtualFiles', JSON.stringify(files));
+                },
+                createFile(id) {
+                    const win = this.windows[id];
+                    if (!win.newFileName) return;
+                    const file = { name: win.newFileName, type: 'text', content: '' };
+                    win.files.push(file);
+                    this.saveVirtualFiles(win.files);
+                    win.newFileName = '';
+                    this.playSound(1200, 0.1);
+                },
+                deleteFile(id, name) {
+                    const win = this.windows[id];
+                    win.files = win.files.filter(f => f.name !== name);
+                    this.saveVirtualFiles(win.files);
+                    if (win.selectedFile === name) {
+                        win.selectedFile = null;
+                        win.fileContent = '';
+                    }
+                    this.playSound(600, 0.08);
+                },
+                selectFile(id, name) {
+                    const win = this.windows[id];
+                    win.selectedFile = name;
+                    const file = win.files.find(f => f.name === name);
+                    win.fileContent = file?.content || '';
+                    this.playSound(900, 0.05);
+                },
+                updateFile(id) {
+                    const win = this.windows[id];
+                    const file = win.files.find(f => f.name === win.selectedFile);
+                    if (file) {
+                        file.content = win.fileContent;
+                        this.saveVirtualFiles(win.files);
+                        this.playSound(1200, 0.1);
+                    }
+                },
+
+                // Music player
+                toggleMusic(id) {
+                    const win = this.windows[id];
+                    win.isPlaying = !win.isPlaying;
+                    this.playSound(win.isPlaying ? 800 : 600, 0.1);
+                },
+                nextTrack(id) {
+                    const win = this.windows[id];
+                    win.currentTrack = (win.currentTrack + 1) % win.tracks.length;
+                    this.playSound(1200, 0.1);
+                },
+                previousTrack(id) {
+                    const win = this.windows[id];
+                    win.currentTrack = (win.currentTrack - 1 + win.tracks.length) % win.tracks.length;
+                    this.playSound(1000, 0.1);
+                },
+                updateVolume(id) {
+                    this.playSound(800, 0.05);
+                },
+
+                // Settings
+                setAccentColor(name) {
+                    const color = this.colors.find(c => c.name === name);
+                    if (color) {
+                        document.documentElement.style.setProperty('--primary', color.value);
+                        localStorage.setItem('accentColor', name);
+                        this.playSound(1100, 0.1);
+                    }
+                },
+                updateSoundVolume() {
+                    const settings = Object.values(this.windows).find(w => w.type === 'settings');
+                    if (settings) {
+                        soundVolume = settings.soundVolume;
+                        localStorage.setItem('soundVolume', soundVolume);
+                    }
+                    this.playSound(1000, 0.05);
+                },
+
+                // Snake Game
+                initSnakeGame(id) {
+                    const win = this.windows[id];
+                    win.snakeBody = [[10, 10]];
+                    win.snakeDirection = [1, 0];
+                    win.snakeNextDirection = [1, 0];
+                    win.food = [Math.floor(Math.random() * 20), Math.floor(Math.random() * 20)];
+                    win.snakeScore = 0;
+                    win.snakePaused = false;
+                    win.snakeGameRunning = true;
+
+                    this.$nextTick(() => {
+                        this.drawSnakeGame(id);
+                        this.snakeGameLoop(id);
+                    });
+                    this.playSound(1200, 0.1);
+                },
+                drawSnakeGame(id) {
+                    const canvas = document.getElementById(`snake-${id}`);
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    const cellSize = canvas.width / 20;
+
+                    ctx.fillStyle = '#0a0e27';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const win = this.windows[id];
+
+                    // Draw food
+                    ctx.fillStyle = '#ff006e';
+                    ctx.fillRect(win.food[0] * cellSize, win.food[1] * cellSize, cellSize, cellSize);
+
+                    // Draw snake
+                    ctx.fillStyle = '#00ff88';
+                    win.snakeBody.forEach(segment => {
+                        ctx.fillRect(segment[0] * cellSize, segment[1] * cellSize, cellSize - 1, cellSize - 1);
+                    });
+
+                    // Draw grid
+                    ctx.strokeStyle = 'rgba(0, 255, 136, 0.1)';
+                    ctx.lineWidth = 0.5;
+                    for (let i = 0; i <= 20; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(i * cellSize, 0);
+                        ctx.lineTo(i * cellSize, canvas.height);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(0, i * cellSize);
+                        ctx.lineTo(canvas.width, i * cellSize);
+                        ctx.stroke();
+                    }
+                },
+                snakeGameLoop(id) {
+                    const win = this.windows[id];
+                    if (!win.snakeGameRunning) return;
+
+                    if (!win.snakePaused) {
+                        win.snakeDirection = win.snakeNextDirection;
+
+                        const head = [...win.snakeBody[0]];
+                        head[0] += win.snakeDirection[0];
+                        head[1] += win.snakeDirection[1];
+
+                        if (head[0] < 0 || head[0] >= 20 || head[1] < 0 || head[1] >= 20 ||
+                            win.snakeBody.some(s => s[0] === head[0] && s[1] === head[1])) {
+                            win.snakePaused = true;
+                            alert(`Game Over! Score: ${win.snakeScore}`);
+                            return;
+                        }
+
+                        win.snakeBody.unshift(head);
+
+                        if (head[0] === win.food[0] && head[1] === win.food[1]) {
+                            win.snakeScore += 10;
+                            win.food = [Math.floor(Math.random() * 20), Math.floor(Math.random() * 20)];
+                            this.playSound(1200, 0.15);
+                        } else {
+                            win.snakeBody.pop();
+                        }
+                    }
+
+                    this.drawSnakeGame(id);
+                    setTimeout(() => this.snakeGameLoop(id), 100);
+                },
+                toggleSnakePause(id) {
+                    const win = this.windows[id];
+                    win.snakePaused = !win.snakePaused;
+                    this.playSound(900, 0.08);
+                },
+                handleKeyDown(event) {
+                    if (!this.activeWindow) return;
+                    const win = this.windows[this.activeWindow];
+                    if (!win) return;
+
+                    if (win.type === 'snake') {
+                        switch(event.key) {
+                            case 'ArrowUp':
+                                if (win.snakeDirection[1] === 0) win.snakeNextDirection = [0, -1];
+                                event.preventDefault();
+                                break;
+                            case 'ArrowDown':
+                                if (win.snakeDirection[1] === 0) win.snakeNextDirection = [0, 1];
+                                event.preventDefault();
+                                break;
+                            case 'ArrowLeft':
+                                if (win.snakeDirection[0] === 0) win.snakeNextDirection = [-1, 0];
+                                event.preventDefault();
+                                break;
+                            case 'ArrowRight':
+                                if (win.snakeDirection[0] === 0) win.snakeNextDirection = [1, 0];
+                                event.preventDefault();
+                                break;
+                        }
+                    } else if (win.type === '2048') {
+                        switch(event.key) {
+                            case 'ArrowUp':
+                                this.move2048(this.activeWindow, 'up');
+                                event.preventDefault();
+                                break;
+                            case 'ArrowDown':
+                                this.move2048(this.activeWindow, 'down');
+                                event.preventDefault();
+                                break;
+                            case 'ArrowLeft':
+                                this.move2048(this.activeWindow, 'left');
+                                event.preventDefault();
+                                break;
+                            case 'ArrowRight':
+                                this.move2048(this.activeWindow, 'right');
+                                event.preventDefault();
+                                break;
+                        }
+                    }
+                },
+                handleKeyUp() {},
+
+                // Tic Tac Toe
+                playTicTacToe(id, index) {
+                    const win = this.windows[id];
+                    if (win.tictactoeBoard[index] !== '' || win.tictactoeWinner) return;
+
+                    win.tictactoeBoard[index] = win.tictactoeCurrentPlayer;
+                    this.playSound(1000, 0.1);
+
+                    if (this.checkTicTacToeWinner(win.tictactoeBoard)) {
+                        win.tictactoeWinner = win.tictactoeCurrentPlayer;
+                        return;
+                    }
+
+                    if (win.tictactoeBoard.every(cell => cell !== '')) {
+                        win.tictactoeWinner = 'Draw';
+                        return;
+                    }
+
+                    win.tictactoeCurrentPlayer = win.tictactoeCurrentPlayer === 'X' ? 'O' : 'X';
+                },
+                checkTicTacToeWinner(board) {
+                    const lines = [
+                        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                        [0, 4, 8], [2, 4, 6]
+                    ];
+                    for (let line of lines) {
+                        if (board[line[0]] !== '' && board[line[0]] === board[line[1]] && board[line[1]] === board[line[2]]) {
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+                resetTicTacToe(id) {
+                    const win = this.windows[id];
+                    win.tictactoeBoard = ['', '', '', '', '', '', '', '', ''];
+                    win.tictactoeCurrentPlayer = 'X';
+                    win.tictactoeWinner = null;
+                    this.playSound(1200, 0.1);
+                },
+
+                // 2048 Game
+                init2048Game(id) {
+                    const win = this.windows[id];
+                    win.game2048Board = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+                    win.game2048Score = 0;
+                    this.add2048Tile(win);
+                    this.add2048Tile(win);
+                    this.playSound(1200, 0.1);
+                },
+                add2048Tile(win) {
+                    const empty = [];
+                    for (let i = 0; i < 4; i++) {
+                        for (let j = 0; j < 4; j++) {
+                            if (win.game2048Board[i][j] === 0) empty.push([i, j]);
+                        }
+                    }
+                    if (empty.length > 0) {
+                        const [i, j] = empty[Math.floor(Math.random() * empty.length)];
+                        win.game2048Board[i][j] = Math.random() < 0.9 ? 2 : 4;
+                    }
+                },
+                move2048(id, direction) {
+                    const win = this.windows[id];
+                    const before = JSON.stringify(win.game2048Board);
+
+                    if (direction === 'left') {
+                        for (let i = 0; i < 4; i++) {
+                            this.slide2048(win.game2048Board[i]);
+                            this.merge2048(win.game2048Board[i]);
+                            this.slide2048(win.game2048Board[i]);
+                        }
+                    } else if (direction === 'right') {
+                        for (let i = 0; i < 4; i++) {
+                            win.game2048Board[i].reverse();
+                            this.slide2048(win.game2048Board[i]);
+                            this.merge2048(win.game2048Board[i]);
+                            this.slide2048(win.game2048Board[i]);
+                            win.game2048Board[i].reverse();
+                        }
+                    } else if (direction === 'up') {
+                        for (let j = 0; j < 4; j++) {
+                            const col = [win.game2048Board[0][j], win.game2048Board[1][j], win.game2048Board[2][j], win.game2048Board[3][j]];
+                            this.slide2048(col);
+                            this.merge2048(col);
+                            this.slide2048(col);
+                            for (let i = 0; i < 4; i++) win.game2048Board[i][j] = col[i];
+                        }
+                    } else if (direction === 'down') {
+                        for (let j = 0; j < 4; j++) {
+                            const col = [win.game2048Board[3][j], win.game2048Board[2][j], win.game2048Board[1][j], win.game2048Board[0][j]];
+                            this.slide2048(col);
+                            this.merge2048(col);
+                            this.slide2048(col);
+                            for (let i = 0; i < 4; i++) win.game2048Board[3 - i][j] = col[i];
+                        }
+                    }
+
+                    if (JSON.stringify(win.game2048Board) !== before) {
+                        this.add2048Tile(win);
+                        this.playSound(900, 0.1);
+                    }
+                },
+                slide2048(row) {
+                    const arr = row.filter(val => val !== 0);
+                    while (arr.length < 4) arr.push(0);
+                    for (let i = 0; i < 4; i++) row[i] = arr[i];
+                },
+                merge2048(row) {
+                    for (let i = 0; i < 3; i++) {
+                        if (row[i] === row[i + 1] && row[i] !== 0) {
+                            row[i] *= 2;
+                            row[i + 1] = 0;
+                        }
+                    }
+                },
+                getTile2048Color(value) {
+                    const colors = {
+                        0: 'rgba(0, 255, 136, 0.05)',
+                        2: '#ffb700',
+                        4: '#ffa500',
+                        8: '#ff9500',
+                        16: '#ff8500',
+                        32: '#ff7500',
+                        64: '#ff6500',
+                        128: '#ff00ff',
+                        256: '#00ffff',
+                        512: '#00ff88',
+                        1024: '#ff006e',
+                        2048: '#00ff00',
+                    };
+                    return colors[value] || colors[2048];
+                },
+
+                shutdown() {
+                    this.playSound(400, 0.2);
+                    alert('Krikit OS shutting down...');
+                    window.location.reload();
+                }
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
